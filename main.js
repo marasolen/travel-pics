@@ -15,20 +15,13 @@ const resizeAndRender = () => {
         .style("height", "50vh")
         .attr("width", d3.max([document.getElementById("full-temporal-visualization-container").clientWidth, 1.3 * document.getElementById("full-temporal-visualization").clientHeight]));
 
-    d3.selectAll("#city-day-visualization-container")
-        //.style("height", "100vh");
-
-    d3.selectAll("#content-reason-visualization")
-        .style("height", "50vh")
-        .attr("width", d3.max([document.getElementById("content-reason-visualization-container").clientWidth, 1.3 * document.getElementById("content-reason-visualization").clientHeight]));
-
     renderVisualization();
 
     d3.selectAll("text")
         .attr("font-size", function() { return d3.select(this).attr("text-multiplier") * 0.008 * document.getElementById("full-temporal-visualization").clientWidth });
 
     d3.select("#tooltip")
-        .style("border-radius", 0.02 * document.getElementById("full-temporal-visualization").clientHeight + "px")
+        .style("border-radius", 0.02 * document.getElementById("full-temporal-visualization").clientHeight + "px");
 
     d3.select("#disclaimer")
         .style("display", +d3.select("svg").attr("width") > window.innerWidth ? "block" : "none");
@@ -411,17 +404,134 @@ const setupCityDayVisualization = () => {
                 .text(time.place);
         });
     });
-
-    
 };
 
 const setupContentReasonVisualization = () => {
+    const containerWidth = document.getElementById("content-reason-visualization-container").clientWidth;
+
+    const margin = {
+        top: 0.03 * containerWidth / 4,
+        right: 0.03 * containerWidth / 4,
+        bottom: 0.03 * containerWidth / 4,
+        left: 0.03 * containerWidth / 4
+    };
+
+    const width = containerWidth - margin.left - margin.right;
+
+    const svg = d3.select("#content-reason-visualization");
+
+    const chartArea = svg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const reasonColours = {
+        "record": "#7fc97f",
+        "funny": "#beaed4",
+        "pretty": "#fdc086",
+        "interesting": "#ffff99",
+    };
+        
+    const groupedData = d3.groups(imageData, d => d.contents).sort((a, b) => b[1].length - a[1].length);
+    groupedData.forEach(group => {
+        group[1].sort((a, b) => Object.keys(reasonColours).findIndex(d => d === a.reason) - Object.keys(reasonColours).findIndex(d => d === b.reason))
+    });
+
+    let currentHeight = margin.top;
+
+    const labelMargin = 0.1 * width;
+    const itemWidth = width / 60;
+    const itemWidthPlusMargin = itemWidth + 2;
+    const itemHeight = width / 45;
+    const itemHeightPlusMargin = itemHeight + 2;
+    const numPerRow = Math.floor((width - labelMargin) / itemWidthPlusMargin)
+
+    for (let i = 0; i < groupedData.length; i++) {
+        const startHeight = currentHeight;
+        currentHeight = startHeight + margin.top + itemHeightPlusMargin * Math.ceil(groupedData[i][1].length / numPerRow);
+
+        const row = chartArea.append("g")
+            .attr("transform", `translate(0, ${startHeight})`);
+
+        row.append("text")
+            .attr("text-multiplier", 2)
+            .attr("text-anchor", "start")
+            .attr("dominant-baseline", "top")
+            .attr("transform", `translate(0, ${margin.top})`)
+            .text(groupedData[i][0]);
+
+        const polaroids = row.selectAll(".polaroid")
+            .data(groupedData[i][1])
+            .join("g")
+            .attr("transform", (_, i) => `translate(${labelMargin + itemWidthPlusMargin * (i % numPerRow)}, ${itemHeightPlusMargin * Math.floor(i / numPerRow)})`);
+
+        polaroids.selectAll(".polaroid-border")
+            .data(d => [d])    
+            .join("rect")
+            .attr("class", "polaroid-border")
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.5)
+            .attr("x", -itemWidth / 2)
+            .attr("y", -itemHeight / 2)
+            .attr("width", itemWidth)
+            .attr("height", itemHeight)
+            .on('mouseover', function(event, d) {
+                d3.select("#tooltip")
+                    .style("display", "block")
+                    .style("left", (event.pageX + tooltipPadding) + 'px')
+                    .style("top", (event.pageY + tooltipPadding) + 'px')
+                    .html(`<img src="images/${d.filename}" width="${width / 4}"><br>
+                            <i>Date/Time: ${d.datetime.format("MMM D, H:mm")}</i><br>
+                            <i>Content: ${d.contents}</i><br>
+                            <i>Reason: ${d.reason}</i>`);
+            })
+            .on("mousemove", (event) => {
+                d3.select("#tooltip")
+                    .style("display", "block")
+                    .style("left", (event.pageX + tooltipPadding) + 'px')
+                    .style("top", (event.pageY + tooltipPadding) + 'px');
+            })
+            .on('mouseleave', function(_, d) {
+                d3.select("#tooltip").style("display", "none");
+            });
+
+        polaroids.selectAll(".polaroid-image")
+            .data(d => [d])    
+            .join("rect")
+            .attr("class", "polaroid-image")
+            .attr("fill", d => reasonColours[d.reason])
+            .attr("x", -itemWidth * 0.4)
+            .attr("y", -itemWidth * 0.4)
+            .attr("width", itemWidth * 0.8)
+            .attr("height", itemWidth * 0.8)
+            .on('mouseover', function(event, d) {
+                d3.select("#tooltip")
+                    .style("display", "block")
+                    .style("left", (event.pageX + tooltipPadding) + 'px')
+                    .style("top", (event.pageY + tooltipPadding) + 'px')
+                    .html(`<img src="images/${d.filename}" width="${width / 4}"><br>
+                            <i>Date/Time: ${d.datetime.format("MMM D, H:mm")}</i><br>
+                            <i>Content: ${d.contents}</i><br>
+                            <i>Reason: ${d.reason}</i>`);
+            })
+            .on("mousemove", (event) => {
+                d3.select("#tooltip")
+                    .style("display", "block")
+                    .style("left", (event.pageX + tooltipPadding) + 'px')
+                    .style("top", (event.pageY + tooltipPadding) + 'px');
+            })
+            .on('mouseleave', function(_, d) {
+                d3.select("#tooltip").style("display", "none");
+            });
+    }
+
+    d3.selectAll("#content-reason-visualization")
+        .style("height", currentHeight + "px");
 };
 
 const renderVisualization = () => {
     setupFullTemporalVisualization();
     setupCityDayVisualization();
-    // setupContentReasonVisualization();
+    setupContentReasonVisualization();
 };
 
 Promise.all([d3.json('data/image-data-3-with-colours.json')]).then(([_imageData]) => {
