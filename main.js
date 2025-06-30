@@ -22,9 +22,6 @@ const resizeAndRender = () => {
 
     d3.select("#tooltip")
         .style("border-radius", 0.02 * document.getElementById("full-temporal-visualization").clientHeight + "px");
-
-    d3.select("#disclaimer")
-        .style("display", +d3.select("svg").attr("width") > window.innerWidth ? "block" : "none");
 };
 
 window.onresize = resizeAndRender;
