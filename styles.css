@@ -14,8 +14,21 @@ body {
     background-color: white;
     margin: auto;
     color: black;
-    margin-left: 20%;
-    margin-right: 20%;
+    margin: auto;
+}
+
+#full-temporal-visualization-container {
+    width: 60%;
+}
+
+#city-day-visualization-container {
+    width: 60%;
+}
+
+.visualization-container .row svg {
+    width: 50%;
+    aspect-ratio: 1 / 1;
+    margin: 0;
 }
 
 .visualization {
@@ -74,6 +87,14 @@ p.caption {
     .column {
         width: 70%;
     }
+
+    #full-temporal-visualization-container {
+        width: 80%;
+    }
+
+    #city-day-visualization-container {
+        width: 80%;
+    }
 }
 
 @media screen and (orientation: portrait) and (max-width: 1280px) {
@@ -94,9 +115,12 @@ p.caption {
         width: 75%;
     }
 
-    .visualization-container {
-        margin-left: 5%;
-        margin-right: 5%;
+    #full-temporal-visualization-container {
+        width: 90%;
+    }
+
+    #city-day-visualization-container {
+        width: 90%;
     }
 }
 
@@ -114,8 +138,11 @@ p.caption {
         width: 90%;
     }
 
-    .visualization-container {
-        margin-left: 2%;
-        margin-right: 2%;
+    #full-temporal-visualization-container {
+        width: 98%;
+    }
+
+    #city-day-visualization-container {
+        width: 98%;
     }
 }

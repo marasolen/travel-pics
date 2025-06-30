@@ -2,10 +2,10 @@ let imageData;
 const tooltipPadding = 15;
 
 const times = [
-    {start: dayjs("2025-05-26 22:00:00"), end: dayjs("2025-05-29 16:45:00"), place: "Toronto"},
-    {start: dayjs("2025-05-30 11:50:00"), end: dayjs("2025-06-01 08:00:00"), place: "Amsterdam"},
-    {start: dayjs("2025-06-01 15:30:00"), end: dayjs("2025-06-06 18:10:00"), place: "Luxembourg"},
-    {start: dayjs("2025-06-06 23:45:00"), end: dayjs("2025-06-09 11:15:00"), place: "Oslo"},
+    {start: dayjs("2025-05-26 22:00:00"), end: dayjs("2025-05-29 16:45:00"), place: "Toronto", sunset: 20.82, sunrise: 5.68},
+    {start: dayjs("2025-05-30 11:50:00"), end: dayjs("2025-06-01 08:00:00"), place: "Amsterdam", sunset: 21.85, sunrise: 5.42},
+    {start: dayjs("2025-06-01 15:30:00"), end: dayjs("2025-06-06 18:10:00"), place: "Luxembourg", sunset: 21.62, sunrise: 5.52},
+    {start: dayjs("2025-06-06 23:45:00"), end: dayjs("2025-06-09 11:15:00"), place: "Oslo", sunset: 22.55, sunrise: 3.98},
 ]
 
 const resizeAndRender = () => {
@@ -15,9 +15,8 @@ const resizeAndRender = () => {
         .style("height", "50vh")
         .attr("width", d3.max([document.getElementById("full-temporal-visualization-container").clientWidth, 1.3 * document.getElementById("full-temporal-visualization").clientHeight]));
 
-    d3.selectAll("#city-day-visualization")
-        .style("height", "50vh")
-        .attr("width", d3.max([document.getElementById("city-day-visualization-container").clientWidth, 1.3 * document.getElementById("city-day-visualization").clientHeight]));
+    d3.selectAll("#city-day-visualization-container")
+        //.style("height", "100vh");
 
     d3.selectAll("#content-reason-visualization")
         .style("height", "50vh")
@@ -149,7 +148,9 @@ const setupFullTemporalVisualization = () => {
             .attr("r", height / 45)
             .attr("cx", height / 45)
             .attr("cy", i * rowHeight + rowHeight / 2)
-            .attr("fill", ["#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d","#666666"][i]);
+            .attr("fill", ["#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d","#666666"][i])
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.5);
         
         topChartArea.append("text")
             .attr("transform", `translate(${height / 15}, ${i * rowHeight + rowHeight / 2})`)
@@ -165,9 +166,9 @@ const setupFullTemporalVisualization = () => {
         .attr("fill", (_, i) => ["#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d","#666666"][i])
         .attr("d", d => area(d.data))
         .attr("stroke", "black")
-        .attr("stroke-width", 0)
+        .attr("stroke-width", 0.5)
         .on('mouseover', function(event, d) {
-            d3.select(this).attr("stroke-width", 1).raise();
+            d3.select(this).attr("stroke-width", 2).raise();
 
             d3.select("#tooltip")
                 .style("display", "block")
@@ -176,14 +177,14 @@ const setupFullTemporalVisualization = () => {
                 .html(`<b>${d.category}</b><br>
                     <i>Count: ${imageData.filter(i => i.contents === d.category).length}</i>`);
         })
-        .on("mousemove", (event, d) => {
+        .on("mousemove", (event) => {
             d3.select("#tooltip")
                 .style("display", "block")
                 .style("left", (event.pageX + tooltipPadding) + 'px')
                 .style("top", (event.pageY + tooltipPadding) + 'px');
         })
         .on('mouseleave', function() {
-            d3.select(this).attr("stroke-width", 0);
+            d3.select(this).attr("stroke-width", 0.5);
 
             d3.select("#tooltip").style("display", "none");
         });
@@ -194,7 +195,9 @@ const setupFullTemporalVisualization = () => {
             .attr("r", height / 45)
             .attr("cx", height / 45)
             .attr("cy", i * rowHeight + rowHeight / 2)
-            .attr("fill", ["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0","#f0027f","#bf5b17","#666666"][i]);
+            .attr("fill", ["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0","#f0027f","#bf5b17","#666666"][i])
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.5);
         
         bottomChartArea.append("text")
             .attr("transform", `translate(${height / 15}, ${i * rowHeight + rowHeight / 2})`)
@@ -210,9 +213,9 @@ const setupFullTemporalVisualization = () => {
         .attr("fill", (_, i) => ["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0","#f0027f","#bf5b17","#666666"][i])
         .attr("d", d => area(d.data))
         .attr("stroke", "black")
-        .attr("stroke-width", 0)
+        .attr("stroke-width", 0.5)
         .on('mouseover', function(event, d) {
-            d3.select(this).attr("stroke-width", 1).raise();
+            d3.select(this).attr("stroke-width", 2).raise();
 
             d3.select("#tooltip")
                 .style("display", "block")
@@ -221,14 +224,14 @@ const setupFullTemporalVisualization = () => {
                 .html(`<b>${d.category}</b><br>
                     <i>Count: ${imageData.filter(i => i.reason === d.category).length}</i>`);
         })
-        .on("mousemove", (event, d) => {
+        .on("mousemove", (event) => {
             d3.select("#tooltip")
                 .style("display", "block")
                 .style("left", (event.pageX + tooltipPadding) + 'px')
                 .style("top", (event.pageY + tooltipPadding) + 'px');
         })
         .on('mouseleave', function() {
-            d3.select(this).attr("stroke-width", 0);
+            d3.select(this).attr("stroke-width", 0.5);
 
             d3.select("#tooltip").style("display", "none");
         });
@@ -266,84 +269,150 @@ const setupFullTemporalVisualization = () => {
 };
 
 const setupCityDayVisualization = () => {
-    const containerWidth = document.getElementById("watch-visualization").clientWidth;
-    const containerHeight = document.getElementById("watch-visualization").clientHeight;
+    const containerWidth = document.getElementById("city-day-visualization-container").clientWidth;
+    const containerHeight = document.getElementById("city-day-visualization-container").clientHeight;
 
-    const margin = {
-        top: 0.04 * containerHeight,
-        right: 0.04 * containerWidth,
-        bottom: 0.1 * containerHeight,
-        left: 0.08 * containerWidth
+    const colourMap = {
+        "contents": {
+            "animal": "#1b9e77",
+            "object": "#d95f02",
+            "view": "#7570b3",
+            "me": "#e7298a",
+            "food": "#66a61e",
+            "room": "#e6ab02",
+            "group": "#a6761d",
+            "work": "#666666"
+        },
+        "reason": {
+            "record": "#7fc97f",
+            "funny": "#beaed4",
+            "pretty": "#fdc086",
+            "interesting": "#ffff99",
+        }
     };
 
-    const width = containerWidth - (margin.right + margin.left);
-    const height = containerHeight - (margin.top + margin.bottom);
+    const margin = {
+        top: 0.03 * containerWidth / 4,
+        right: 0.03 * containerWidth / 4,
+        bottom: 0.03 * containerWidth / 4,
+        left: 0.03 * containerWidth / 4
+    };
 
-    const svg = d3.select("#watch-visualization");
-    const chartArea = svg.append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+    const chartWidth = containerWidth / 4 - margin.left - margin.right;
 
-    const xAxisG = chartArea.append('g')
-        .attr('class', 'axis x-axis')
-        .attr("transform", `translate(0, ${height})`);
+    ["contents", "reason"].forEach((category, i) => {
+        times.forEach((time, j) => {
 
-    const yAxisG = chartArea.append('g')
-        .attr('class', 'axis y-axis')
+            const svg = d3.select("#city-day-visualization-" + (i * 4 + j + 1));
 
-    const fitnessData = boxingData.filter(d => "calories" in d);
+            const filteredData = imageData.filter(d => d.place === time.place);
+            const hourCounts = [...Array(24).keys()].map(_ => 0);
+            filteredData.forEach(d => {
+                d.hour = d.datetime.hour();
+                d.index = hourCounts[d.hour]++;
+            });
 
-    const xScale = d3.scaleLinear()
-        .domain([d3.min(fitnessData, d => d.calories) - 10, d3.max(fitnessData, d => d.calories) + 10])
-        .range([0, width]);
-    const yScale = d3.scaleLinear()
-        .domain([d3.min(fitnessData, d => d.avghr) - 5, d3.max(fitnessData, d => d.avghr) + 5])
-        .range([height, 0]);
+            const chartArea = svg.append('g')
+                .attr('transform', `translate(${margin.left + chartWidth / 2},${margin.top + chartWidth / 2})`);
 
-    const xAxis = d3.axisBottom(xScale)
-        .ticks(8)
-        .tickSize(-height)
-        .tickSizeOuter(0)
-        .tickPadding(10);
-    const yAxis = d3.axisLeft(yScale)
-        .ticks(5)
-        .tickSize(-width)
-        .tickSizeOuter(0)
-        .tickPadding(10);
+            const rScale = d3.scaleLinear()
+                .domain([0, d3.max(filteredData.map(d => d.index))])
+                .range([chartWidth / 5, chartWidth / 2]);
+            const tScale = d3.scaleLinear()
+                .domain([0, 24])
+                .range([-Math.PI / 2, 3 * Math.PI / 2]);
+
+            const polaroids = chartArea.selectAll(".polaroid")
+                .data(filteredData)
+                .join("g");
+
+            polaroids.selectAll(".polaroid-border")
+                .data(d => [d])    
+                .join("rect")
+                .attr("class", "polaroid-border")
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("stroke-width", 0.5)
+                .attr("x", d => rScale(d.index) * Math.cos(tScale(d.hour)) - chartWidth / 60)
+                .attr("y", d => rScale(d.index) * Math.sin(tScale(d.hour)) - chartWidth / 50)
+                .attr("width", chartWidth / 30)
+                .attr("height", chartWidth / 25)
+                .on('mouseover', function(event, d) {
+                    d3.select("#tooltip")
+                        .style("display", "block")
+                        .style("left", (event.pageX + tooltipPadding) + 'px')
+                        .style("top", (event.pageY + tooltipPadding) + 'px')
+                        .html(`<img src="images/${d.filename}" width="${chartWidth}"><br>
+                                <i>Date/Time: ${d.datetime.format("MMM D, H:mm")}</i><br>
+                                <i>Content: ${d.contents}</i><br>
+                                <i>Reason: ${d.reason}</i>`);
+                })
+                .on("mousemove", (event) => {
+                    d3.select("#tooltip")
+                        .style("display", "block")
+                        .style("left", (event.pageX + tooltipPadding) + 'px')
+                        .style("top", (event.pageY + tooltipPadding) + 'px');
+                })
+                .on('mouseleave', function(_, d) {
+                    d3.select("#tooltip").style("display", "none");
+                });
+
+            polaroids.selectAll(".polaroid-image")
+                .data(d => [d])    
+                .join("rect")
+                .attr("class", "polaroid-image")
+                .attr("fill", d => colourMap[category][d[category]])
+                .attr("x", d => rScale(d.index) * Math.cos(tScale(d.hour)) - chartWidth / 80)
+                .attr("y", d => rScale(d.index) * Math.sin(tScale(d.hour)) - chartWidth / 70)
+                .attr("width", chartWidth / 40)
+                .attr("height", chartWidth / 40)
+                .on('mouseover', function(event, d) {
+                    d3.select("#tooltip")
+                        .style("display", "block")
+                        .style("left", (event.pageX + tooltipPadding) + 'px')
+                        .style("top", (event.pageY + tooltipPadding) + 'px')
+                        .html(`<img src="images/${d.filename}" width="${chartWidth}"><br>
+                                <i>Date/Time: ${d.datetime.format("MMM D, H:mm")}</i><br>
+                                <i>Content: ${d.contents}</i><br>
+                                <i>Reason: ${d.reason}</i>`);
+                })
+                .on("mousemove", (event) => {
+                    d3.select("#tooltip")
+                        .style("display", "block")
+                        .style("left", (event.pageX + tooltipPadding) + 'px')
+                        .style("top", (event.pageY + tooltipPadding) + 'px');
+                })
+                .on('mouseleave', function(_, d) {
+                    d3.select("#tooltip").style("display", "none");
+                });
+
+            chartArea.append("path")
+                .attr("fill", "#053752")
+                .attr("d", d3.arc()({
+                    innerRadius: chartWidth / 8,
+                    outerRadius: chartWidth / 7,
+                    startAngle: tScale(0),
+                    endAngle: tScale(24)
+                }));
+
+            chartArea.append("path")
+                .attr("fill", "#EF810E")
+                .attr("d", d3.arc()({
+                    innerRadius: chartWidth / 8,
+                    outerRadius: chartWidth / 7,
+                    startAngle: tScale(time.sunrise) + Math.PI / 2,
+                    endAngle: tScale(time.sunset) + Math.PI / 2
+                }));
+
+            chartArea.append("text")
+                .attr("text-multiplier", 1)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .text(time.place);
+        });
+    });
+
     
-    const points = chartArea.selectAll(".class-circle")
-        .data(fitnessData)    
-        .join("circle")
-        .attr("class", "class-circle")
-        .attr("fill", "#A54657")
-        .attr("cx", d => xScale(d.calories))
-        .attr("cy", d => yScale(d.avghr))
-        .attr("fill-opacity", 0.7)
-        .attr("r", width * 0.012);
-    setTooltip(points, 
-        d => `<b>${dayjs(d.date).format("MMMM D, YYYY")} at ${d.time}</b><br>
-            <i>Instructor: ${d.instructor.split(" ").join(" & ")}</i><br>
-            <i>Calories Burned: ${d.calories}</i><br>
-            <i>Average Heart Rate: ${d.avghr} BPM</i>`);
-
-    chartArea.append("text")
-        .attr("x", width / 2)
-        .attr("y", height + margin.bottom * 0.75)
-        .attr("text-multiplier", 2)
-        .attr("text-anchor", "middle")
-        .text("Calories Burned")
-
-    chartArea.append("text")
-        .attr("transform", `rotate(${-90})`)
-        .attr("x", -height / 2)
-        .attr("y", -margin.left * 0.5)
-        .attr("text-multiplier", 2)
-        .attr("text-anchor", "middle")
-        .text("Average Heart Rate (BPM)")
-
-    xAxisG.call(xAxis);
-    yAxisG.call(yAxis);
-
-    chartArea.selectAll(".axis text").attr("text-multiplier", 1.25);
 };
 
 const setupContentReasonVisualization = () => {
@@ -351,7 +420,7 @@ const setupContentReasonVisualization = () => {
 
 const renderVisualization = () => {
     setupFullTemporalVisualization();
-    // setupCityDayVisualization();
+    setupCityDayVisualization();
     // setupContentReasonVisualization();
 };
 
