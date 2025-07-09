@@ -9,13 +9,14 @@ body {
 
 .visualization-container {
     overflow-y: hidden;
-    overflow-x: scroll;
+    overflow-x: hidden;
     align-items: center;
     background-color: white;
     margin: auto;
     color: black;
     margin: auto;
     width: 60%;
+
 }
 
 .visualization-container .row svg {
@@ -47,9 +48,10 @@ body {
 }
 
 .row img {
-    height: 100%;
-    width: 100%;
+    height: 23%;
+    width: 23%;
     margin: 1%;
+    flex: 1;
 }
 
 p {
@@ -102,7 +104,7 @@ p.caption {
     }
 
     p.caption {
-        width: 75%;
+        width: 85%;
     }
 
     .visualization-container {
@@ -121,7 +123,7 @@ p.caption {
     }
 
     p.caption {
-        width: 90%;
+        width: 95%;
     }
 
     .visualization-container {
